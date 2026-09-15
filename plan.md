@@ -144,13 +144,13 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 11. Launching Firefox (launcher)
 
-- [ ] Launch options (`WithExecPath`, `WithHeadless`, `WithTimeout`,
+- [x] Launch options (`WithExecPath`, `WithHeadless`, `WithTimeout`,
       `WithArgs`, `WithProfile`)
-- [ ] Spawn the Firefox process with `--remote-debugging-port` (Remote Agent)
-- [ ] Wait for endpoint readiness (poll `session.status` / HTTP)
-- [ ] Pipe-based connection mode (fd 3/fd 4) where supported
-- [ ] Graceful process shutdown (`Close`, kill on context cancel)
-- [ ] `Launch(ctx, opts...)` at the root package level
+- [x] Spawn the Firefox process with `--remote-debugging-port` (Remote Agent)
+- [x] Wait for endpoint readiness (poll `session.status` / HTTP)
+- [x] Pipe-based connection mode (fd 3/fd 4) where supported
+- [x] Graceful process shutdown (`Close`, kill on context cancel)
+- [x] `Launch(ctx, opts...)` at the root package level
 
 ## Phase 12. Examples (examples/)
 

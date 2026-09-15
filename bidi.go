@@ -19,6 +19,7 @@ package bidi
 
 import (
 	"github.com/yvv4git/go-bidi/browser"
+	"github.com/yvv4git/go-bidi/launcher"
 	"github.com/yvv4git/go-bidi/protocol"
 	"github.com/yvv4git/go-bidi/transport"
 )
@@ -56,6 +57,28 @@ type Transport = transport.Transport
 // RemoteValue is a serialized JavaScript value.
 type RemoteValue = protocol.RemoteValue
 
+// Firefox is a handle to a launched browser process.
+type Firefox = launcher.Firefox
+
+// Launcher options re-exported from the launcher package. WithTimeout comes
+// from the launcher and sets the readiness deadline, unlike the client
+// command deadline of the same name; use launcher.WithTimeout directly when
+// both meanings are in play.
+var (
+	// WithLaunchExecPath sets the path to the browser binary.
+	WithLaunchExecPath = launcher.WithExecPath
+	// WithLaunchHeadless starts the browser in headless mode.
+	WithLaunchHeadless = launcher.WithHeadless
+	// WithLaunchTimeout sets the maximum wait for browser readiness.
+	WithLaunchTimeout = launcher.WithTimeout
+	// WithLaunchArgs adds extra command-line arguments.
+	WithLaunchArgs = launcher.WithArgs
+	// WithLaunchProfile sets the Firefox profile directory.
+	WithLaunchProfile = launcher.WithProfile
+	// WithLaunchPipe enables pipe-based connection mode.
+	WithLaunchPipe = launcher.WithPipe
+)
+
 // Constructors exposed through the root package.
 var (
 	// Connect establishes a BiDi session over an existing transport.
@@ -74,6 +97,8 @@ var (
 	NewRequests = browser.NewRequests
 	// NewLogs records log entries for a browsing context.
 	NewLogs = browser.NewLogs
+	// Launch starts a browser process and waits until it is ready.
+	Launch = launcher.Launch
 )
 
 // Options exposed through the root package.
