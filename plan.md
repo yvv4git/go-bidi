@@ -53,14 +53,14 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 2. Protocol (protocol/)
 
-- [ ] BiDi message types: `Command`, `Response`, `Error`, `Event`
-- [ ] JSON-RPC 2.0 encoding/decoding (marshal/unmarshal)
-- [ ] Distinguish responses from events when parsing a frame
-- [ ] `Error` type with error code and message
-- [ ] Method-name constants per module (session, browsingContext, script, ...)
-- [ ] `RemoteValue` type and result wrappers for `script.evaluate`
-- [ ] Parameter/result types for commands and events
-- [ ] Unit tests for encoding/decoding
+- [x] BiDi message types: `Command`, `Response`, `Error`, `Event`
+- [x] JSON-RPC 2.0 encoding/decoding (marshal/unmarshal)
+- [x] Distinguish responses from events when parsing a frame
+- [x] `Error` type with error code and message
+- [x] Method-name constants per module (session, browsingContext, script, ...)
+- [x] `RemoteValue` type and result wrappers for `script.evaluate`
+- [x] Parameter/result types for commands and events
+- [x] Unit tests for encoding/decoding
 
 ## Phase 3. session module
 
