@@ -78,6 +78,48 @@ const (
 	OriginElement = "element"
 )
 
+// BytesValue kinds accepted by the network module.
+const (
+	// BytesValueString is a literal byte string.
+	BytesValueString = "string"
+	// BytesValueBase64 is a base64-encoded byte string.
+	BytesValueBase64 = "base64"
+)
+
+// Intercept phases accepted by network.addIntercept.
+const (
+	// InterceptPhaseBeforeRequestSent intercepts before a request is sent.
+	InterceptPhaseBeforeRequestSent = "beforeRequestSent"
+	// InterceptPhaseResponseStarted intercepts when a response starts.
+	InterceptPhaseResponseStarted = "responseStarted"
+	// InterceptPhaseAuthRequired intercepts authentication challenges.
+	InterceptPhaseAuthRequired = "authRequired"
+)
+
+// Actions accepted by network.continueWithAuth.
+const (
+	// AuthActionDefault lets the browser handle authentication.
+	AuthActionDefault = "default"
+	// AuthActionCancel cancels the authentication challenge.
+	AuthActionCancel = "cancel"
+	// AuthActionProvideCredentials supplies authentication credentials.
+	AuthActionProvideCredentials = "provideCredentials"
+)
+
+// Credential types accepted by network.authCredentials.
+const (
+	// AuthCredentialsTypePassword sends username and password.
+	AuthCredentialsTypePassword = "password"
+)
+
+// Cache behaviors accepted by network.setCacheBehavior.
+const (
+	// CacheBehaviorDefault uses the browser cache normally.
+	CacheBehaviorDefault = "default"
+	// CacheBehaviorBypass ignores the cache.
+	CacheBehaviorBypass = "bypass"
+)
+
 // Result ownership modes accepted by script evaluation commands.
 const (
 	// ResultOwnershipNone does not retain the result.

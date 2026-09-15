@@ -114,15 +114,15 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 8. Network module
 
-- [ ] Subscribe to network-module events
-- [ ] Events: `beforeRequestSent`, `responseStarted`, `responseCompleted`,
+- [x] Subscribe to network-module events
+- [x] Events: `beforeRequestSent`, `responseStarted`, `responseCompleted`,
       `fetchError`, `authRequired`
-- [ ] `network.continueRequest`, `continueResponse`
-- [ ] `network.failRequest`
-- [ ] `network.provideResponse`
-- [ ] `network.addIntercept` / `network.removeIntercept`
-- [ ] `network.setCacheBehavior`
-- [ ] Collect and store page network requests (list + poll helper)
+- [x] `network.continueRequest`, `continueResponse`
+- [x] `network.failRequest`
+- [x] `network.provideResponse`
+- [x] `network.addIntercept` / `network.removeIntercept`
+- [x] `network.setCacheBehavior`
+- [x] Collect and store page network requests (list + poll helper)
 
 ## Phase 9. Log module and other modules
 
