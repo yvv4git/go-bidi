@@ -28,6 +28,34 @@ type BrowsingContextNavigateResult struct {
 	URL        string `json:"url"`
 }
 
+// BrowsingContextReloadParams are the parameters of browsingContext.reload.
+type BrowsingContextReloadParams struct {
+	Context     string `json:"context"`
+	IgnoreCache bool   `json:"ignoreCache,omitempty"`
+	Wait        string `json:"wait,omitempty"`
+}
+
+// BrowsingContextReloadResult is the result of browsingContext.reload.
+type BrowsingContextReloadResult struct {
+	Navigation string `json:"navigation"`
+	URL        string `json:"url"`
+}
+
+// Viewport describes the size of a browsing context viewport.
+type Viewport struct {
+	Width  int `json:"width"`
+	Height int `json:"height"`
+}
+
+// BrowsingContextSetViewportParams are the parameters of
+// browsingContext.setViewport. Viewport and DevicePixelRatio are optional;
+// when both are nil the override is cleared.
+type BrowsingContextSetViewportParams struct {
+	Context          string    `json:"context"`
+	Viewport         *Viewport `json:"viewport,omitempty"`
+	DevicePixelRatio *float64  `json:"devicePixelRatio,omitempty"`
+}
+
 // BrowsingContextInfo describes a browsing context and its descendants.
 type BrowsingContextInfo struct {
 	Children       []BrowsingContextInfo `json:"children"`
@@ -65,14 +93,25 @@ type BrowsingContextTraverseHistoryParams struct {
 }
 
 // BrowsingContextCaptureScreenshotParams are the parameters of
-// browsingContext.captureScreenshot.
+// browsingContext.captureScreenshot. CaptureBeyondViewport captures the whole
+// document when set.
 type BrowsingContextCaptureScreenshotParams struct {
-	Context string `json:"context"`
-	Origin  string `json:"origin,omitempty"`
+	Context               string `json:"context"`
+	Origin                string `json:"origin,omitempty"`
+	CaptureBeyondViewport bool   `json:"captureBeyondViewport,omitempty"`
 }
 
 // BrowsingContextCaptureScreenshotResult is the result of
 // browsingContext.captureScreenshot. Data is a base64-encoded PNG image.
 type BrowsingContextCaptureScreenshotResult struct {
 	Data string `json:"data"`
+}
+
+// NavigationInfo describes the navigation state reported by the
+// navigation-related browsingContext events.
+type NavigationInfo struct {
+	Context    string `json:"context"`
+	Navigation string `json:"navigation,omitempty"`
+	Timestamp  int64  `json:"timestamp"`
+	URL        string `json:"url"`
 }

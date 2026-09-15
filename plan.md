@@ -84,16 +84,15 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 5. BrowsingContext module
 
-- [ ] `browsingContext.create` (new tab/window/frame)
-- [ ] `browsingContext.navigate` (with `wait` and `readinessState`)
-- [ ] `browsingContext.getTree` (context tree, top-level frames)
-- [ ] `browsingContext.close`
-- [ ] `browsingContext.reload`, `traverseHistory` (back/forward)
-- [ ] `browsingContext.captureScreenshot` (viewport / full page)
-- [ ] `browsingContext.setViewport`
-- [ ] Events: `contextCreated`, `contextDestroyed`, `navigationStarted`,
-      `load`, `domContentLoaded`, `fragmentNavigated`
-- [ ] High-level `Page` type (wrapper over a context id)
+- [x] `browsingContext.create` (new tab/window/frame)
+- [x] `browsingContext.navigate` (with `wait` and `readinessState`)
+- [x] `browsingContext.getTree` (context tree, top-level frames)
+- [x] `browsingContext.close`
+- [x] `browsingContext.reload`, `traverseHistory` (back/forward)
+- [x] `browsingContext.captureScreenshot` (viewport / full page)
+- [x] `browsingContext.setViewport`
+- [x] Events: `contextCreated`, `contextDestroyed`, `navigationStarted`, `load`, `domContentLoaded`, `fragmentNavigated`
+- [x] High-level `Page` type (wrapper over a context id)
 
 ## Phase 6. Script module
 
