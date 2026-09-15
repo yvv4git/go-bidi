@@ -26,6 +26,58 @@ const (
 	OriginDocument = "document"
 )
 
+// Input source types accepted by input.performActions.
+const (
+	// InputSourceTypeKey is a keyboard input source.
+	InputSourceTypeKey = "key"
+	// InputSourceTypePointer is a pointer input source.
+	InputSourceTypePointer = "pointer"
+	// InputSourceTypeWheel is a wheel input source.
+	InputSourceTypeWheel = "wheel"
+	// InputSourceTypeNone introduces a pause tick to synchronize sources.
+	InputSourceTypeNone = "none"
+)
+
+// Action types of a key input source.
+const (
+	// KeyActionKeyDown presses a key.
+	KeyActionKeyDown = "keyDown"
+	// KeyActionKeyUp releases a key.
+	KeyActionKeyUp = "keyUp"
+	// KeyActionPause waits for the given duration.
+	KeyActionPause = "pause"
+)
+
+// Action types of a pointer input source.
+const (
+	// PointerActionPointerDown presses a pointer button.
+	PointerActionPointerDown = "pointerDown"
+	// PointerActionPointerUp releases a pointer button.
+	PointerActionPointerUp = "pointerUp"
+	// PointerActionPointerMove moves the pointer to the given coordinates.
+	PointerActionPointerMove = "pointerMove"
+	// PointerActionPointerCancel cancels the pointer input.
+	PointerActionPointerCancel = "pointerCancel"
+	// PointerActionPause waits for the given duration.
+	PointerActionPause = "pause"
+)
+
+// Action types of a wheel input source.
+const (
+	// WheelActionScroll scrolls by the given deltas.
+	WheelActionScroll = "scroll"
+	// WheelActionPause waits for the given duration.
+	WheelActionPause = "pause"
+)
+
+// Pointer origins accepted by pointer and wheel actions.
+const (
+	// OriginPointer uses the current pointer position.
+	OriginPointer = "pointer"
+	// OriginElement uses the referenced element.
+	OriginElement = "element"
+)
+
 // Result ownership modes accepted by script evaluation commands.
 const (
 	// ResultOwnershipNone does not retain the result.

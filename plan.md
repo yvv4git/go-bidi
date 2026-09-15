@@ -107,10 +107,10 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 7. Input module
 
-- [ ] `input.performActions` (keyboard, mouse, wheel)
-- [ ] `input.releaseActions`
-- [ ] `input.setFiles`
-- [ ] `Click`, `Type`, `Press`, `Scroll` helpers on `Page`
+- [x] `input.performActions` (keyboard, mouse, wheel)
+- [x] `input.releaseActions`
+- [x] `input.setFiles`
+- [x] `Click`, `Type`, `Press`, `Scroll` helpers on `Page`
 
 ## Phase 8. Network module
 
