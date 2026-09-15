@@ -37,11 +37,11 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 0. Project bootstrap
 
-- [ ] Initialize `go.mod` (module `github.com/yvv4git/go-bidi`)
-- [ ] Add the `github.com/coder/websocket` dependency
-- [ ] Add `.golangci.yml`, `.markdownlint.json`, `NOTICE`
-- [ ] Set up the package layout (`transport/`, `protocol/`, `browser/`, `examples/`)
-- [ ] Describe the architecture and layers in the `bidi.go` root package doc comment
+- [x] Initialize `go.mod` (module `github.com/yvv4git/go-bidi`)
+- [x] Add the `github.com/coder/websocket` dependency
+- [x] Add `.golangci.yml`, `.markdownlint.json`, `NOTICE`
+- [x] Set up the package layout (`transport/`, `protocol/`, `browser/`, `examples/`)
+- [x] Describe the architecture and layers in the `bidi.go` root package doc comment
 
 ## Phase 1. Transport (transport/)
 
