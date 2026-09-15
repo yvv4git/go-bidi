@@ -33,6 +33,10 @@ type Page = browser.Page
 // Session issues commands over a Caller and tracks subscriptions.
 type Session = browser.Session
 
+// Client routes commands over a transport and dispatches events to the
+// active subscriptions.
+type Client = browser.Client
+
 // Subscription delivers events for one session.subscribe call.
 type Subscription = browser.Subscription
 

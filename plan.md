@@ -154,13 +154,13 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 12. Examples (examples/)
 
-- [ ] `connect/` — handshake and `session.status`
-- [ ] `basic/` — open a page, navigate, screenshot
-- [ ] `evaluate/` — run JS and decode `RemoteValue`
-- [ ] `input/` — click, type text, key presses
-- [ ] `events/` — subscribe to browsingContext/script events
-- [ ] `network/` — intercept and modify requests
-- [ ] `screenshot/` — viewport and full-page capture
+- [x] `connect/` — handshake and `session.status`
+- [x] `basic/` — open a page, navigate, screenshot
+- [x] `evaluate/` — run JS and decode `RemoteValue`
+- [x] `input/` — click, type text, key presses
+- [x] `events/` — subscribe to browsingContext/script events
+- [x] `network/` — intercept and modify requests
+- [x] `screenshot/` — viewport and full-page capture
 
 ## Phase 13. Quality, tests, documentation
 
