@@ -13,6 +13,12 @@ linters:
     - unused
     - revive
     - wsl_v5
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - revive
+          - wsl_v5
 
 formatters:
   enable:
@@ -82,10 +88,3 @@ linters-settings:
 
   staticcheck:
     checks: ["all", "-ST1000", "-ST1003"]
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - revive
-        - wsl_v5

@@ -74,13 +74,13 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 4. Client core and message routing
 
-- [ ] Reader loop: continuously read frames from the transport
-- [ ] Match responses to requests by `id` (pending map -> chan)
-- [ ] Generate monotonic `id`s (atomic)
-- [ ] Demultiplex events by subscription
-- [ ] Publish events to subscribers (fan-out / callback)
-- [ ] Graceful shutdown: cancel contexts, close `pending` channels
-- [ ] Handle timeouts and `context` while waiting for a response
+- [x] Reader loop: continuously read frames from the transport
+- [x] Match responses to requests by `id` (pending map -> chan)
+- [x] Generate monotonic `id`s (atomic)
+- [x] Demultiplex events by subscription
+- [x] Publish events to subscribers (fan-out / callback)
+- [x] Graceful shutdown: cancel contexts, close `pending` channels
+- [x] Handle timeouts and `context` while waiting for a response
 
 ## Phase 5. browsingContext module
 
