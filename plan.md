@@ -64,13 +64,13 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 3. session module
 
-- [ ] Handshake: HTTP `POST /session` with capabilities (`webSocketUrl: true`)
-- [ ] Parse `sessionId` and `webSocketUrl` from the response
-- [ ] Establish the WebSocket with the `webdriver.bidi` subprotocol
-- [ ] `session.status`
-- [ ] `session.new` / `session.end`
-- [ ] `session.subscribe` / `session.unsubscribe` (subscribe to events by module)
-- [ ] Track active subscriptions
+- [x] Handshake: HTTP `POST /session` with capabilities (`webSocketUrl: true`)
+- [x] Parse `sessionId` and `webSocketUrl` from the response
+- [x] Establish the WebSocket with the `webdriver.bidi` subprotocol
+- [x] `session.status`
+- [x] `session.new` / `session.end`
+- [x] `session.subscribe` / `session.unsubscribe` (subscribe to events by module)
+- [x] Track active subscriptions
 
 ## Phase 4. Client core and message routing
 

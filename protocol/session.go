@@ -38,3 +38,9 @@ type SessionSubscribeParams struct {
 type SessionSubscribeResult struct {
 	Subscription string `json:"subscription"`
 }
+
+// SessionUnsubscribeParams are the parameters of session.unsubscribe.
+// Subscriptions holds the ids returned by session.subscribe.
+type SessionUnsubscribeParams struct {
+	Subscriptions []string `json:"subscriptions"`
+}
