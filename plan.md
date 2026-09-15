@@ -45,11 +45,11 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 1. Transport (transport/)
 
-- [ ] Define the `Transport` interface (`Send`, `Receive`, `Close`)
-- [ ] Implement `WebSocketTransport` (Dial, Send, Receive, Close)
-- [ ] Implement `PipeTransport` for fd 3/fd 4 (pipe-based launch)
-- [ ] Ensure thread safety and correct channel shutdown
-- [ ] Unit tests for the transport
+- [x] Define the `Transport` interface (`Send`, `Receive`, `Close`)
+- [x] Implement `WebSocketTransport` (Dial, Send, Receive, Close)
+- [x] Implement `PipeTransport` for fd 3/fd 4 (pipe-based launch)
+- [x] Ensure thread safety and correct channel shutdown
+- [x] Unit tests for the transport
 
 ## Phase 2. Protocol (protocol/)
 
