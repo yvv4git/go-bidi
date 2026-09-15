@@ -120,6 +120,48 @@ const (
 	CacheBehaviorBypass = "bypass"
 )
 
+// Cookie same site values accepted by the storage module.
+const (
+	// CookieSameSiteLax sends cookies on same-site requests only.
+	CookieSameSiteLax = "Lax"
+	// CookieSameSiteStrict never sends cookies on cross-site requests.
+	CookieSameSiteStrict = "Strict"
+	// CookieSameSiteNone sends cookies on all requests.
+	CookieSameSiteNone = "None"
+)
+
+// Log levels reported by log.entryAdded.
+const (
+	// LogLevelDebug is the debug level.
+	LogLevelDebug = "debug"
+	// LogLevelInfo is the info level.
+	LogLevelInfo = "info"
+	// LogLevelWarn is the warn level.
+	LogLevelWarn = "warn"
+	// LogLevelError is the error level.
+	LogLevelError = "error"
+)
+
+// Log entry types reported by log.entryAdded.
+const (
+	// LogTypeGeneric is a generic log entry.
+	LogTypeGeneric = "generic"
+	// LogTypeConsole is a console method call.
+	LogTypeConsole = "console"
+	// LogTypeJavascript is a JavaScript error.
+	LogTypeJavascript = "javascript"
+)
+
+// Permission states accepted by permissions.setPermission.
+const (
+	// PermissionStateGranted grants the permission.
+	PermissionStateGranted = "granted"
+	// PermissionStateDenied denies the permission.
+	PermissionStateDenied = "denied"
+	// PermissionStatePrompt asks for the permission on use.
+	PermissionStatePrompt = "prompt"
+)
+
 // Result ownership modes accepted by script evaluation commands.
 const (
 	// ResultOwnershipNone does not retain the result.

@@ -126,11 +126,11 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 9. Log module and other modules
 
-- [ ] `log` — `entryAdded` event, log-reading helpers
-- [ ] `storage` — cookies, localStorage/sessionStorage
-- [ ] `permissions` — `setPermission`
-- [ ] `browser` — `browser.close`, `browser.createUserContext`
-- [ ] `emulation` — `setGeolocationOverride`, `setTimezoneOverride`
+- [x] `log` — `entryAdded` event, log-reading helpers
+- [x] `storage` — cookies, localStorage/sessionStorage
+- [x] `permissions` — `setPermission`
+- [x] `browser` — `browser.close`, `browser.createUserContext`
+- [x] `emulation` — `setGeolocationOverride`, `setTimezoneOverride`
 
 ## Phase 10. High-level API (browser/ and bidi.go)
 
