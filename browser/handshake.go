@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/yvv4git/go-bidi/transport"
 )
@@ -30,12 +31,14 @@ type HandshakeResult struct {
 	Transport    transport.Transport
 }
 
-// HandshakeOption customizes Handshake.
-type HandshakeOption func(*handshakeConfig)
+// Option customizes Handshake, Connect, ConnectEndpoint and NewClient.
+type Option func(*config)
 
-type handshakeConfig struct {
+type config struct {
 	httpClient   *http.Client
 	capabilities map[string]any
+	timeout      time.Duration
+	subprotocols []string
 }
 
 type sessionResponse struct {
@@ -44,19 +47,35 @@ type sessionResponse struct {
 }
 
 // WithHTTPClient sets the client used for the session creation request.
-func WithHTTPClient(client *http.Client) HandshakeOption {
-	return func(c *handshakeConfig) {
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *config) {
 		c.httpClient = client
 	}
 }
 
 // WithCapabilities merges extra alwaysMatch capabilities into the request.
-func WithCapabilities(caps map[string]any) HandshakeOption {
-	return func(c *handshakeConfig) {
+func WithCapabilities(caps map[string]any) Option {
+	return func(c *config) {
 		c.capabilities = make(map[string]any, len(caps))
 		for key, value := range caps {
 			c.capabilities[key] = value
 		}
+	}
+}
+
+// WithTimeout sets the default deadline applied to commands that do not
+// carry their own context deadline.
+func WithTimeout(timeout time.Duration) Option {
+	return func(c *config) {
+		c.timeout = timeout
+	}
+}
+
+// WithSubprotocol overrides the WebSocket subprotocols negotiated by
+// Handshake and ConnectEndpoint. The default is transport.BidiSubprotocol.
+func WithSubprotocol(subprotocols ...string) Option {
+	return func(c *config) {
+		c.subprotocols = append([]string(nil), subprotocols...)
 	}
 }
 
@@ -65,9 +84,9 @@ func WithCapabilities(caps map[string]any) HandshakeOption {
 func Handshake(
 	ctx context.Context,
 	addr string,
-	opts ...HandshakeOption,
+	opts ...Option,
 ) (*HandshakeResult, error) {
-	cfg := handshakeConfig{httpClient: http.DefaultClient}
+	cfg := config{httpClient: http.DefaultClient}
 	for _, opt := range opts {
 		opt(&cfg)
 	}
@@ -87,7 +106,7 @@ func Handshake(
 		return nil, fmt.Errorf("parse websocket url: %w", err)
 	}
 
-	tr, err := transport.DialBidi(ctx, endpoint)
+	tr, err := cfg.dial(ctx, endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("dial websocket: %w", err)
 	}
@@ -95,7 +114,15 @@ func Handshake(
 	return response.result(wsURL, tr), nil
 }
 
-func (c *handshakeConfig) newSessionRequest(
+func (c *config) dial(ctx context.Context, endpoint *url.URL) (transport.Transport, error) {
+	if len(c.subprotocols) > 0 {
+		return transport.DialWebSocket(ctx, endpoint, c.subprotocols...)
+	}
+
+	return transport.DialBidi(ctx, endpoint)
+}
+
+func (c *config) newSessionRequest(
 	ctx context.Context,
 	addr string,
 ) (*http.Request, error) {
@@ -116,7 +143,7 @@ func (c *handshakeConfig) newSessionRequest(
 	return req, nil
 }
 
-func (c *handshakeConfig) requestBody() ([]byte, error) {
+func (c *config) requestBody() ([]byte, error) {
 	alwaysMatch := make(map[string]any, len(c.capabilities)+1)
 
 	for key, value := range c.capabilities {
@@ -142,7 +169,7 @@ func (c *handshakeConfig) requestBody() ([]byte, error) {
 	return body, nil
 }
 
-func (c *handshakeConfig) createSession(
+func (c *config) createSession(
 	ctx context.Context,
 	addr string,
 ) (*sessionResponse, error) {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"go.uber.org/atomic"
 
@@ -28,6 +29,8 @@ type pending struct {
 type Client struct {
 	tr transport.Transport
 
+	timeout time.Duration
+
 	mu      sync.Mutex
 	pending map[int64]chan pending
 	nextID  atomic.Int64
@@ -48,11 +51,18 @@ type Client struct {
 var _ Caller = (*Client)(nil)
 
 // NewClient starts a reader loop over tr and returns a routed client.
-func NewClient(tr transport.Transport) *Client {
+// Options such as WithTimeout configure the client.
+func NewClient(tr transport.Transport, opts ...Option) *Client {
+	var cfg config
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
 	loopCtx, loopCancel := context.WithCancel(context.Background())
 
 	c := &Client{
 		tr:          tr,
+		timeout:     cfg.timeout,
 		pending:     make(map[int64]chan pending),
 		loopCtx:     loopCtx,
 		loopCancel:  loopCancel,
@@ -68,8 +78,19 @@ func NewClient(tr transport.Transport) *Client {
 }
 
 // Call sends a command and waits for its response, decoding the result into
-// result when non-nil.
+// result when non-nil. When the client was configured with a timeout and
+// ctx carries no deadline of its own, the command is bounded by that
+// timeout.
 func (c *Client) Call(ctx context.Context, method string, params, result any) error {
+	if c.timeout > 0 {
+		if _, ok := ctx.Deadline(); !ok {
+			timeoutCtx, cancel := context.WithTimeout(ctx, c.timeout)
+			defer cancel()
+
+			ctx = timeoutCtx
+		}
+	}
+
 	select {
 	case <-c.closed:
 		return ErrClosed

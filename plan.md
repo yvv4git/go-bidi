@@ -134,13 +134,13 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 10. High-level API (browser/ and bidi.go)
 
-- [ ] `Browser` type (wrapper over transport + router)
-- [ ] `Connect(ctx, tr)` — connect over an existing transport
-- [ ] `ConnectEndpoint(ctx, addr)` — handshake over an HTTP address
-- [ ] `Page`/`Tab` type with control methods
-- [ ] `NewPage`, `Page`, `Pages`, `Close` methods
-- [ ] Re-export the public API from the root `bidi.go` package
-- [ ] Client options (`WithTimeout`, `WithHTTPClient`, `WithSubprotocol`)
+- [x] `Browser` type (wrapper over transport + router)
+- [x] `Connect(ctx, tr)` — connect over an existing transport
+- [x] `ConnectEndpoint(ctx, addr)` — handshake over an HTTP address
+- [x] `Page`/`Tab` type with control methods
+- [x] `NewPage`, `Page`, `Pages`, `Close` methods
+- [x] Re-export the public API from the root `bidi.go` package
+- [x] Client options (`WithTimeout`, `WithHTTPClient`, `WithSubprotocol`)
 
 ## Phase 11. Launching Firefox (launcher)
 
