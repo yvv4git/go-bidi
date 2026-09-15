@@ -62,7 +62,7 @@ BiDi specifics that matter for the implementation:
 - [x] Parameter/result types for commands and events
 - [x] Unit tests for encoding/decoding
 
-## Phase 3. session module
+## Phase 3. Session module
 
 - [x] Handshake: HTTP `POST /session` with capabilities (`webSocketUrl: true`)
 - [x] Parse `sessionId` and `webSocketUrl` from the response
@@ -82,7 +82,7 @@ BiDi specifics that matter for the implementation:
 - [x] Graceful shutdown: cancel contexts, close `pending` channels
 - [x] Handle timeouts and `context` while waiting for a response
 
-## Phase 5. browsingContext module
+## Phase 5. BrowsingContext module
 
 - [ ] `browsingContext.create` (new tab/window/frame)
 - [ ] `browsingContext.navigate` (with `wait` and `readinessState`)
@@ -95,7 +95,7 @@ BiDi specifics that matter for the implementation:
       `load`, `domContentLoaded`, `fragmentNavigated`
 - [ ] High-level `Page` type (wrapper over a context id)
 
-## Phase 6. script module
+## Phase 6. Script module
 
 - [ ] `script.evaluate` (with `awaitPromise`, `resultOwnership`)
 - [ ] `script.callFunction` (argument and this passing)
@@ -106,14 +106,14 @@ BiDi specifics that matter for the implementation:
 - [ ] Events: `script.message`, `script.realmCreated`, `script.realmDestroyed`
 - [ ] High-level `Evaluate` and `CallFunction` helpers on `Page`
 
-## Phase 7. input module
+## Phase 7. Input module
 
 - [ ] `input.performActions` (keyboard, mouse, wheel)
 - [ ] `input.releaseActions`
 - [ ] `input.setFiles`
 - [ ] `Click`, `Type`, `Press`, `Scroll` helpers on `Page`
 
-## Phase 8. network module
+## Phase 8. Network module
 
 - [ ] Subscribe to network-module events
 - [ ] Events: `beforeRequestSent`, `responseStarted`, `responseCompleted`,
@@ -125,7 +125,7 @@ BiDi specifics that matter for the implementation:
 - [ ] `network.setCacheBehavior`
 - [ ] Collect and store page network requests (list + poll helper)
 
-## Phase 9. log module and other modules
+## Phase 9. Log module and other modules
 
 - [ ] `log` — `entryAdded` event, log-reading helpers
 - [ ] `storage` — cookies, localStorage/sessionStorage
