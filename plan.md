@@ -96,14 +96,14 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 6. Script module
 
-- [ ] `script.evaluate` (with `awaitPromise`, `resultOwnership`)
-- [ ] `script.callFunction` (argument and this passing)
-- [ ] Decode `RemoteValue` into Go values (primitives, arrays, objects)
-- [ ] `script.getRealms`
-- [ ] `script.addPreloadScript` / `script.removePreloadScript`
-- [ ] `script.disown`
-- [ ] Events: `script.message`, `script.realmCreated`, `script.realmDestroyed`
-- [ ] High-level `Evaluate` and `CallFunction` helpers on `Page`
+- [x] `script.evaluate` (with `awaitPromise`, `resultOwnership`)
+- [x] `script.callFunction` (argument and this passing)
+- [x] Decode `RemoteValue` into Go values (primitives, arrays, objects)
+- [x] `script.getRealms`
+- [x] `script.addPreloadScript` / `script.removePreloadScript`
+- [x] `script.disown`
+- [x] Events: `script.message`, `script.realmCreated`, `script.realmDestroyed`
+- [x] High-level `Evaluate` and `CallFunction` helpers on `Page`
 
 ## Phase 7. Input module
 

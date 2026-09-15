@@ -104,6 +104,55 @@ func (p *Page) SetViewport(ctx context.Context, width, height int) error {
 	return p.caller.Call(ctx, protocol.BrowsingContextSetViewport, params, nil)
 }
 
+// Evaluate runs a JavaScript expression in the page context. The promise is
+// awaited when the expression returns one.
+func (p *Page) Evaluate(
+	ctx context.Context,
+	expression string,
+) (*protocol.ScriptEvaluateResult, error) {
+	params := protocol.ScriptEvaluateParams{
+		Expression:      expression,
+		Target:          protocol.ScriptTarget{Context: p.id},
+		ResultOwnership: protocol.ResultOwnershipNone,
+		AwaitPromise:    true,
+	}
+
+	var result protocol.ScriptEvaluateResult
+	if err := p.caller.Call(ctx, protocol.ScriptEvaluate, params, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// CallFunction calls a JavaScript function in the page context, passing the
+// given arguments.
+func (p *Page) CallFunction(
+	ctx context.Context,
+	function string,
+	args ...protocol.ScriptArgument,
+) (*protocol.ScriptEvaluateResult, error) {
+	arguments := append([]protocol.ScriptArgument(nil), args...)
+	if arguments == nil {
+		arguments = []protocol.ScriptArgument{}
+	}
+
+	params := protocol.ScriptCallFunctionParams{
+		FunctionDeclaration: function,
+		Arguments:           arguments,
+		Target:              protocol.ScriptTarget{Context: p.id},
+		ResultOwnership:     protocol.ResultOwnershipNone,
+		AwaitPromise:        true,
+	}
+
+	var result protocol.ScriptEvaluateResult
+	if err := p.caller.Call(ctx, protocol.ScriptCallFunction, params, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
 // Close closes the browsing context.
 func (p *Page) Close(ctx context.Context) error {
 	params := protocol.BrowsingContextCloseParams{Context: p.id}

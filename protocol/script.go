@@ -190,3 +190,81 @@ func (v *RemoteValue) decodeObject() (map[string]any, error) {
 
 	return out, nil
 }
+
+// ScriptArgument is a value passed to script.callFunction or a preload
+// script. It is either a local value ({type, value}) or a reference to a
+// remote value ({handle} / {sharedId} / {internalId}).
+type ScriptArgument struct {
+	Type       string          `json:"type,omitempty"`
+	Value      json.RawMessage `json:"value,omitempty"`
+	Handle     string          `json:"handle,omitempty"`
+	SharedID   string          `json:"sharedId,omitempty"`
+	InternalID string          `json:"internalId,omitempty"`
+}
+
+// ScriptCallFunctionParams are the parameters of script.callFunction.
+// Arguments holds the values passed to the function and This sets the this
+// value.
+type ScriptCallFunctionParams struct {
+	FunctionDeclaration  string                `json:"functionDeclaration"`
+	Arguments            []ScriptArgument      `json:"arguments"`
+	SerializationOptions *SerializationOptions `json:"serializationOptions,omitempty"`
+	Target               ScriptTarget          `json:"target"`
+	ResultOwnership      string                `json:"resultOwnership,omitempty"`
+	AwaitPromise         bool                  `json:"awaitPromise,omitempty"`
+	This                 *RemoteValue          `json:"this,omitempty"`
+	UserActivation       bool                  `json:"userActivation,omitempty"`
+}
+
+// ScriptRealmInfo describes a realm of an execution context.
+type ScriptRealmInfo struct {
+	Realm  string `json:"realm"`
+	Origin string `json:"origin"`
+	Type   string `json:"type"`
+}
+
+// ScriptGetRealmsParams are the parameters of script.getRealms. Contexts
+// filters the returned realms to specific browsing contexts.
+type ScriptGetRealmsParams struct {
+	Contexts []string `json:"contexts,omitempty"`
+}
+
+// ScriptGetRealmsResult is the result of script.getRealms.
+type ScriptGetRealmsResult struct {
+	Realms []ScriptRealmInfo `json:"realms"`
+}
+
+// ScriptAddPreloadScriptParams are the parameters of
+// script.addPreloadScript. Contexts limits the script to specific browsing
+// contexts.
+type ScriptAddPreloadScriptParams struct {
+	FunctionDeclaration string           `json:"functionDeclaration"`
+	Arguments           []ScriptArgument `json:"arguments,omitempty"`
+	Contexts            []string         `json:"contexts,omitempty"`
+	Sandbox             string           `json:"sandbox,omitempty"`
+}
+
+// ScriptAddPreloadScriptResult is the result of script.addPreloadScript.
+type ScriptAddPreloadScriptResult struct {
+	Script string `json:"script"`
+}
+
+// ScriptRemovePreloadScriptParams are the parameters of
+// script.removePreloadScript.
+type ScriptRemovePreloadScriptParams struct {
+	Script string `json:"script"`
+}
+
+// ScriptDisownParams are the parameters of script.disown. Handles holds the
+// remote object handles to release.
+type ScriptDisownParams struct {
+	Handles []string     `json:"handles"`
+	Target  ScriptTarget `json:"target"`
+}
+
+// ScriptMessageParams are the parameters of the script.message event.
+type ScriptMessageParams struct {
+	Channel string          `json:"channel"`
+	Data    json.RawMessage `json:"data"`
+	Source  ScriptRealmInfo `json:"source"`
+}
