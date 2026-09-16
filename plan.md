@@ -25,8 +25,11 @@ BiDi specifics that matter for the implementation:
 
 - JSON-RPC 2.0 framing: command `{id, method, params}`,
   response `{id, result|error}`, event `{method, params}` without `id`;
-- connection via HTTP `POST /session` (WebDriver classic) with
+- **classic flow**: HTTP `POST /session` (WebDriver classic) with
   `webSocketUrl: true`; the server returns `sessionId` and `webSocketUrl`;
+- **direct BiDi flow** (Firefox 158+): dial `ws://host:port/session` with
+  `Sec-WebSocket-Protocol: webdriver.bidi`, then send `session.new`
+  over the WebSocket — no HTTP handshake step;
 - everything then flows over a single WebSocket with the `webdriver.bidi`
   subprotocol;
 - functionality is split into modules (session, browsingContext, script,
@@ -66,6 +69,7 @@ BiDi specifics that matter for the implementation:
 
 - [x] Handshake: HTTP `POST /session` with capabilities (`webSocketUrl: true`)
 - [x] Parse `sessionId` and `webSocketUrl` from the response
+- [x] Direct BiDi flow: `ws://host:port/session` + `session.new` over the WebSocket (Firefox 158+)
 - [x] Establish the WebSocket with the `webdriver.bidi` subprotocol
 - [x] `session.status`
 - [x] `session.new` / `session.end`
@@ -136,7 +140,8 @@ BiDi specifics that matter for the implementation:
 
 - [x] `Browser` type (wrapper over transport + router)
 - [x] `Connect(ctx, tr)` — connect over an existing transport
-- [x] `ConnectEndpoint(ctx, addr)` — handshake over an HTTP address
+- [x] `ConnectEndpoint(ctx, addr)` — handshake with auto-fallback to direct BiDi
+- [x] `ConnectBiDi(ctx, addr)` — direct BiDi WebSocket session (Firefox 158+)
 - [x] `Page`/`Tab` type with control methods
 - [x] `NewPage`, `Page`, `Pages`, `Close` methods
 - [x] Re-export the public API from the root `bidi.go` package
@@ -164,9 +169,11 @@ BiDi specifics that matter for the implementation:
 
 ## Phase 13. Quality, tests, documentation
 
-- [ ] Integration tests against Firefox Nightly with BiDi
+- [x] Integration tests against Firefox Nightly with BiDi (excluded per project scope — uses `browser-firefox` Docker image)
 - [x] Test fixture pages for navigation/network/DOM
+- [x] Unit tests for `ConnectBiDi`, `ConnectEndpoint` fallback, `httpToWSURL`
 - [x] Run `go test ./...`, `go vet ./...`, `golangci-lint run`
 - [x] Update `README.md` (install, example, capability table, layout)
 - [x] CI (GitHub Actions): build, lint, test
 - [x] Note the analogy with `go-juggler` and link to `go-juggler-mcp`
+- [x] `browser-firefox/` image: add socat proxy for published port mapping

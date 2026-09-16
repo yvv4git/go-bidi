@@ -124,12 +124,24 @@ at its `http` endpoint, or take full control of the raw channel:
 ```go
 result, err := bidi.Handshake(ctx, "http://127.0.0.1:9222")
 if err != nil {
-    log.Fatal(err)
+	log.Fatal(err)
 }
 defer result.Transport.Close()
 
 client := bidi.NewClient(result.Transport, bidi.WithTimeout(30*time.Second))
 session := bidi.NewSession(client, result.SessionID)
+```
+
+Firefox 158+ no longer supports the classic `POST /session` handshake.
+`ConnectEndpoint` falls back to the direct BiDi WebSocket flow
+automatically; you can also use `ConnectBiDi` explicitly:
+
+```go
+browser, err := bidi.ConnectBiDi(ctx, "http://127.0.0.1:9222")
+if err != nil {
+	log.Fatal(err)
+}
+defer func() { _ = browser.Close(ctx) }()
 ```
 
 ## Capabilities

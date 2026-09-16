@@ -26,19 +26,14 @@ func main() {
 
 	fmt.Printf("connecting to %s\n", *endpoint)
 
-	result, err := bidi.Handshake(ctx, *endpoint)
+	browser, err := bidi.ConnectEndpoint(ctx, *endpoint)
 	support.Must(err)
 
-	defer func() { _ = result.Transport.Close() }()
+	defer func() { _ = browser.Close(ctx) }()
 
-	fmt.Printf("session:      %s\n", result.SessionID)
-	fmt.Printf("websocket:    %s\n", result.WebSocketURL)
-	fmt.Printf("capabilities: %v\n", result.Capabilities)
+	fmt.Printf("session: %s\n", browser.Session().ID())
 
-	client := bidi.NewClient(result.Transport)
-	session := bidi.NewSession(client, result.SessionID)
-
-	status, err := session.Status(ctx)
+	status, err := browser.Session().Status(ctx)
 	support.Must(err)
 	fmt.Printf("status: ready=%t message=%q\n", status.Ready, status.Message)
 }

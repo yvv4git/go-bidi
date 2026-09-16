@@ -87,7 +87,12 @@ var (
 var (
 	// Connect establishes a BiDi session over an existing transport.
 	Connect = browser.Connect
-	// ConnectEndpoint performs the handshake and connects over HTTP.
+	// ConnectBiDi connects directly over a BiDi WebSocket (session.new).
+	// Use this with Firefox 158+ or browsers that no longer support
+	// the classic POST /session handshake.
+	ConnectBiDi = browser.ConnectBiDi
+	// ConnectEndpoint performs the handshake and connects over HTTP,
+	// falling back to direct BiDi when the classic endpoint is unavailable.
 	ConnectEndpoint = browser.ConnectEndpoint
 	// Handshake creates a session over the WebDriver classic endpoint.
 	Handshake = browser.Handshake

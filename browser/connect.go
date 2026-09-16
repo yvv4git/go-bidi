@@ -37,17 +37,26 @@ func Connect(ctx context.Context, tr transport.Transport, opts ...Option) (*Brow
 }
 
 // ConnectEndpoint performs the WebDriver classic handshake at addr and
-// returns a Browser for the created session.
+// returns a Browser for the created session.  If the classic POST /session
+// endpoint is unavailable (e.g. Firefox 158+), ConnectEndpoint
+// transparently falls back to the direct BiDi WebSocket flow.
 func ConnectEndpoint(ctx context.Context, addr string, opts ...Option) (*Browser, error) {
 	result, err := Handshake(ctx, addr, opts...)
-	if err != nil {
+	if err == nil {
+		client := NewClient(result.Transport, opts...)
+		session := NewSession(client, result.SessionID)
+
+		return newBrowser(client, session), nil
+	}
+
+	// Classic handshake failed — try the direct BiDi WebSocket session
+	// flow used by newer browser implementations.
+	browser, fallbackErr := ConnectBiDi(ctx, addr, opts...)
+	if fallbackErr != nil {
 		return nil, err
 	}
 
-	client := NewClient(result.Transport, opts...)
-	session := NewSession(client, result.SessionID)
-
-	return newBrowser(client, session), nil
+	return browser, nil
 }
 
 func newBrowser(client *Client, session *Session) *Browser {

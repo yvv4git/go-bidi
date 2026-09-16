@@ -163,3 +163,115 @@ func TestHandshakeWithHTTPClient(t *testing.T) {
 		t.Fatalf("Handshake error = %v, want %v", err, sentinel)
 	}
 }
+
+func TestHTTPToWSURL(t *testing.T) {
+	for _, tc := range []struct {
+		in, want string
+	}{
+		{in: "http://127.0.0.1:9222", want: "ws://127.0.0.1:9222/session"},
+		{in: "https://127.0.0.1:9222", want: "wss://127.0.0.1:9222/session"},
+		{in: "ws://127.0.0.1:9222/session", want: "ws://127.0.0.1:9222/session"},
+		{in: "wss://127.0.0.1:9222/session", want: "wss://127.0.0.1:9222/session"},
+		{in: "http://host:8080/", want: "ws://host:8080/session"},
+		{in: "http://127.0.0.1:9222/anything", want: "ws://127.0.0.1:9222/session"},
+	} {
+		got := httpToWSURL(tc.in)
+		if got != tc.want {
+			t.Errorf("httpToWSURL(%q) = %q, want %q", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestConnectBiDiCreatesSession(t *testing.T) {
+	srv := newDirectBiDiServer(t)
+
+	browser, err := ConnectBiDi(context.Background(), srv.URL)
+	if err != nil {
+		t.Fatalf("ConnectBiDi: %v", err)
+	}
+	defer func() { _ = browser.Close(context.Background()) }()
+
+	if browser.Session().ID() == "" {
+		t.Error("session ID is empty")
+	}
+}
+
+func TestConnectEndpointFallsBackToDirectBiDi(t *testing.T) {
+	srv := newDirectBiDiServer(t)
+
+	browser, err := ConnectEndpoint(context.Background(), srv.URL)
+	if err != nil {
+		t.Fatalf("ConnectEndpoint: %v", err)
+	}
+	defer func() { _ = browser.Close(context.Background()) }()
+
+	if browser.Session().ID() == "" {
+		t.Error("session ID is empty")
+	}
+}
+
+// newDirectBiDiServer returns a test server that only speaks the direct
+// BiDi WebSocket flow: POST /session returns 400 (classic unavailable),
+// while GET /session upgrades to a BiDi WebSocket that accepts session.new.
+func newDirectBiDiServer(t *testing.T) *httptest.Server {
+	t.Helper()
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc(_sessionPath, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet || r.Header.Get("Upgrade") != "" {
+			conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
+				Subprotocols: []string{transport.BidiSubprotocol},
+			})
+			if err != nil {
+				return
+			}
+
+			defer func() { _ = conn.CloseNow() }()
+
+			for {
+				_, data, err := conn.Read(r.Context())
+				if err != nil {
+					return
+				}
+
+				var cmd struct {
+					ID     int64  `json:"id"`
+					Method string `json:"method"`
+				}
+				if err := json.Unmarshal(data, &cmd); err != nil {
+					continue
+				}
+
+				var result any
+
+				switch cmd.Method {
+				case "session.status":
+					result = map[string]any{"ready": true, "message": ""}
+				case "session.new":
+					result = map[string]any{
+						"sessionId":    "direct-s1",
+						"capabilities": map[string]any{"browserName": "firefox"},
+					}
+				case "session.end":
+					result = map[string]any{}
+				}
+
+				resp, _ := json.Marshal(map[string]any{
+					"type":   "success",
+					"id":     cmd.ID,
+					"result": result,
+				})
+
+				_ = conn.Write(r.Context(), websocket.MessageText, resp)
+			}
+		}
+
+		http.Error(w, "The handshake request must use GET method", http.StatusBadRequest)
+	})
+
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	return srv
+}

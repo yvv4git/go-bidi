@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/yvv4git/go-bidi/protocol"
 	"github.com/yvv4git/go-bidi/transport"
 )
 
@@ -221,4 +222,89 @@ func (r *sessionResponse) result(wsURL string, tr transport.Transport) *Handshak
 		Capabilities: r.Capabilities,
 		Transport:    tr,
 	}
+}
+
+// buildConfig extracts a config from options, filling in defaults.
+func buildConfig(opts []Option) config {
+	cfg := config{httpClient: http.DefaultClient}
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	return cfg
+}
+
+// httpToWSURL converts an HTTP or WebSocket base address to the BiDi
+// WebSocket session endpoint ws://host[:port]/session.
+func httpToWSURL(addr string) string {
+	addr = strings.TrimRight(addr, "/")
+
+	u, err := url.Parse(addr)
+	if err != nil {
+		return "ws://" + addr + "/session"
+	}
+
+	switch u.Scheme {
+	case "http":
+		u.Scheme = "ws"
+	case "https":
+		u.Scheme = "wss"
+	case "ws", "wss":
+	default:
+		u.Scheme = "ws"
+	}
+
+	u.Path = _sessionPath
+
+	return u.String()
+}
+
+// ConnectBiDi connects directly over a BiDi WebSocket, creating a session
+// with session.new.  addr may be an HTTP URL (http://host:port), a
+// WebSocket URL (ws://host:port/session), or a bare host:port pair.
+// This is the connection flow used by Firefox 158+ and newer BiDi
+// implementations that no longer expose the classic POST /session
+// endpoint.
+func ConnectBiDi(
+	ctx context.Context,
+	addr string,
+	opts ...Option,
+) (*Browser, error) {
+	cfg := buildConfig(opts)
+
+	wsURL := httpToWSURL(addr)
+
+	endpoint, err := url.Parse(wsURL)
+	if err != nil {
+		return nil, fmt.Errorf("parse websocket url: %w", err)
+	}
+
+	tr, err := cfg.dial(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("dial biDi: %w", err)
+	}
+
+	alwaysMatch := make(map[string]any, len(cfg.capabilities)+1)
+	for key, value := range cfg.capabilities {
+		alwaysMatch[key] = value
+	}
+
+	alwaysMatch[_capWebSocketURL] = true
+
+	client := NewClient(tr, opts...)
+
+	params := protocol.SessionNewParams{
+		Capabilities: protocol.SessionCapabilities{
+			AlwaysMatch: alwaysMatch,
+		},
+	}
+
+	session, err := CreateSession(ctx, client, params)
+	if err != nil {
+		_ = client.Close()
+
+		return nil, err
+	}
+
+	return newBrowser(client, session), nil
 }
