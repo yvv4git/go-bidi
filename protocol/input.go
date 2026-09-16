@@ -1,16 +1,7 @@
 package protocol
 
 // PointerOrigin selects the coordinate origin of a pointer or wheel action.
-// Element is only used when Type is OriginElement.
-type PointerOrigin struct {
-	Type    string            `json:"type"`
-	Element *ElementReference `json:"element,omitempty"`
-}
-
-// ElementReference points to an element by its shared id.
-type ElementReference struct {
-	SharedID string `json:"sharedId"`
-}
+type PointerOrigin string
 
 // InputAction is a single input action. Type selects the action kind and is
 // one of the input action constants; the remaining fields are populated
@@ -18,7 +9,7 @@ type ElementReference struct {
 type InputAction struct {
 	Type     string         `json:"type"`
 	Value    string         `json:"value,omitempty"`
-	Button   int            `json:"button,omitempty"`
+	Button   int            `json:"button"`
 	X        int64          `json:"x,omitempty"`
 	Y        int64          `json:"y,omitempty"`
 	DX       int64          `json:"dx,omitempty"`

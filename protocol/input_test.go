@@ -28,8 +28,8 @@ func TestInputPerformActionsParams(t *testing.T) {
 
 	got := string(data)
 	want := `{"context":"c1","actions":[{"type":"key","id":"keyboard",` +
-		`"actions":[{"type":"keyDown","value":"a"},{"type":"keyUp","value":"a"},` +
-		`{"type":"pause","duration":100}]}]}`
+		`"actions":[{"type":"keyDown","value":"a","button":0},{"type":"keyUp","value":"a","button":0},` +
+		`{"type":"pause","button":0,"duration":100}]}]}`
 	if got != want {
 		t.Errorf("got %s, want %s", got, want)
 	}
@@ -37,13 +37,10 @@ func TestInputPerformActionsParams(t *testing.T) {
 
 func TestInputPointerOrigin(t *testing.T) {
 	action := InputAction{
-		Type: PointerActionPointerMove,
-		X:    10,
-		Y:    20,
-		Origin: &PointerOrigin{
-			Type:    OriginElement,
-			Element: &ElementReference{SharedID: "e1"},
-		},
+		Type:   PointerActionPointerMove,
+		X:      10,
+		Y:      20,
+		Origin: ptrOrigin(OriginPointer),
 	}
 
 	data, err := json.Marshal(action)
@@ -52,8 +49,7 @@ func TestInputPointerOrigin(t *testing.T) {
 	}
 
 	got := string(data)
-	want := `{"type":"pointerMove","x":10,"y":20,` +
-		`"origin":{"type":"element","element":{"sharedId":"e1"}}}`
+	want := `{"type":"pointerMove","button":0,"x":10,"y":20,"origin":"pointer"}`
 	if got != want {
 		t.Errorf("got %s, want %s", got, want)
 	}
@@ -64,7 +60,7 @@ func TestInputWheelAction(t *testing.T) {
 		Type:   WheelActionScroll,
 		DX:     -50,
 		DY:     100,
-		Origin: &PointerOrigin{Type: OriginViewport},
+		Origin: ptrOrigin(PointerOrigin(OriginViewport)),
 	}
 
 	data, err := json.Marshal(action)
@@ -73,7 +69,7 @@ func TestInputWheelAction(t *testing.T) {
 	}
 
 	got := string(data)
-	want := `{"type":"scroll","dx":-50,"dy":100,"origin":{"type":"viewport"}}`
+	want := `{"type":"scroll","button":0,"dx":-50,"dy":100,"origin":"viewport"}`
 	if got != want {
 		t.Errorf("got %s, want %s", got, want)
 	}
@@ -90,6 +86,10 @@ func TestInputReleaseActionsParams(t *testing.T) {
 	if got := string(data); got != `{"context":"c1"}` {
 		t.Errorf("got %s, want %s", got, `{"context":"c1"}`)
 	}
+}
+
+func ptrOrigin(o PointerOrigin) *PointerOrigin {
+	return &o
 }
 
 func TestInputSetFilesParams(t *testing.T) {
