@@ -86,7 +86,7 @@ func TestPageClick(t *testing.T) {
 		t.Errorf("move = %+v, want 10, 20", action)
 	}
 
-	if action.Origin == nil || action.Origin.Type != protocol.OriginViewport {
+	if action.Origin == nil || *action.Origin != protocol.PointerOrigin(protocol.OriginViewport) {
 		t.Errorf("origin = %+v, want viewport", action.Origin)
 	}
 }
@@ -105,7 +105,7 @@ func TestPagePress(t *testing.T) {
 		t.Fatalf("actions = %+v, want keyDown and keyUp", source.Actions)
 	}
 
-	if source.Actions[0].Type != protocol.KeyActionKeyDown || source.Actions[0].Value != "Enter" {
+	if source.Actions[0].Type != protocol.KeyActionKeyDown || source.Actions[0].Value != "\r" {
 		t.Errorf("actions[0] = %+v, want keyDown Enter", source.Actions[0])
 	}
 

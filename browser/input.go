@@ -49,7 +49,7 @@ func (p *Page) Click(ctx context.Context, x, y int64) error {
 				Type:   protocol.PointerActionPointerMove,
 				X:      x,
 				Y:      y,
-				Origin: &protocol.PointerOrigin{Type: protocol.OriginViewport},
+				Origin: ptrOrigin(protocol.PointerOrigin(protocol.OriginViewport)),
 			},
 			{Type: protocol.PointerActionPointerDown, Button: 0},
 			{Type: protocol.PointerActionPointerUp, Button: 0},
@@ -62,16 +62,36 @@ func (p *Page) Click(ctx context.Context, x, y int64) error {
 // Press presses and releases a keyboard key, for example "Enter", "a" or
 // "ArrowUp".
 func (p *Page) Press(ctx context.Context, key string) error {
+	value := keyValue(key)
+
 	source := protocol.InputSourceActions{
 		Type: protocol.InputSourceTypeKey,
 		ID:   "keyboard",
 		Actions: []protocol.InputAction{
-			{Type: protocol.KeyActionKeyDown, Value: key},
-			{Type: protocol.KeyActionKeyUp, Value: key},
+			{Type: protocol.KeyActionKeyDown, Value: value},
+			{Type: protocol.KeyActionKeyUp, Value: value},
 		},
 	}
 
 	return p.perform(ctx, source)
+}
+
+// keyValue maps a key name to the value expected by the BiDi protocol.
+func keyValue(key string) string {
+	switch key {
+	case "Enter":
+		return "\r"
+	case "Backspace":
+		return "\b"
+	case "Tab":
+		return "\t"
+	case "Escape":
+		return "\x1b"
+	case "Delete":
+		return "\x7f"
+	default:
+		return key
+	}
 }
 
 // Type types each rune of text into the focused element.
@@ -103,7 +123,7 @@ func (p *Page) Scroll(ctx context.Context, deltaX, deltaY int64) error {
 				Type:   protocol.WheelActionScroll,
 				DX:     deltaX,
 				DY:     deltaY,
-				Origin: &protocol.PointerOrigin{Type: protocol.OriginViewport},
+				Origin: ptrOrigin(protocol.PointerOrigin(protocol.OriginViewport)),
 			},
 		},
 	}
@@ -118,4 +138,8 @@ func (p *Page) perform(ctx context.Context, sources ...protocol.InputSourceActio
 	}
 
 	return p.caller.Call(ctx, protocol.InputPerformActions, params, nil)
+}
+
+func ptrOrigin(o protocol.PointerOrigin) *protocol.PointerOrigin {
+	return &o
 }
