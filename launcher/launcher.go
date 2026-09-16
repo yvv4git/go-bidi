@@ -88,12 +88,13 @@ func WithPipe(pipe bool) Option {
 // Firefox is a handle to a launched browser process. The process is killed
 // by Close or by cancellation of the context passed to Launch.
 type Firefox struct {
-	cmd      *exec.Cmd
-	endpoint *url.URL
-	port     int
-	pipe     bool
-	tr       transport.Transport
-	readyFn  func(ctx context.Context, endpoint *url.URL) error
+	cmd       *exec.Cmd
+	endpoint  *url.URL
+	port      int
+	pipe      bool
+	tr        transport.Transport
+	readyFn   func(ctx context.Context, endpoint *url.URL) error
+	cleanupFn func()
 
 	mu   sync.Mutex
 	done chan struct{}
@@ -157,6 +158,10 @@ func (f *Firefox) Close() error {
 
 	if f.cmd != nil {
 		<-f.done
+	}
+
+	if f.cleanupFn != nil {
+		f.cleanupFn()
 	}
 
 	return nil
@@ -249,14 +254,43 @@ func (cfg *config) resolveExecPath() error {
 		return nil
 	}
 
-	path, err := exec.LookPath("firefox")
-	if err != nil {
-		return fmt.Errorf("find firefox: %w", err)
+	// Try exec.LookPath first (works on Linux and if Firefox is in PATH)
+	if path, err := exec.LookPath("firefox"); err == nil {
+		cfg.execPath = path
+		return nil
 	}
 
-	cfg.execPath = path
+	// Try common macOS application paths
+	if path := findFile(
+		"/Applications/Firefox.app/Contents/MacOS/firefox",
+		os.Getenv("HOME")+"/Applications/Firefox.app/Contents/MacOS/firefox",
+	); path != "" {
+		cfg.execPath = path
+		return nil
+	}
 
-	return nil
+	// Try common Linux binary paths
+	if path := findFile(
+		"/usr/bin/firefox",
+		"/usr/local/bin/firefox",
+		"/opt/firefox/firefox",
+	); path != "" {
+		cfg.execPath = path
+		return nil
+	}
+
+	return fmt.Errorf("find firefox: firefox executable not found in PATH or standard application directories")
+}
+
+// findFile returns the first existing file path from the given list.
+func findFile(paths ...string) string {
+	for _, p := range paths {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+
+	return ""
 }
 
 func (cfg *config) init(ctx context.Context) (*Firefox, []*os.File, error) {
@@ -264,10 +298,25 @@ func (cfg *config) init(ctx context.Context) (*Firefox, []*os.File, error) {
 		return nil, nil, err
 	}
 
+	// Create a temporary profile if none was specified. This isolates
+	// the launched browser from any already-running Firefox instance.
+	var cleanupFn func()
+
+	if cfg.profile == "" {
+		tmpDir, err := os.MkdirTemp("", "go-bidi-firefox-*")
+		if err != nil {
+			return nil, nil, fmt.Errorf("create temp profile: %w", err)
+		}
+
+		cfg.profile = tmpDir
+		cleanupFn = func() { _ = os.RemoveAll(tmpDir) }
+	}
+
 	f := &Firefox{
-		pipe:    cfg.pipe,
-		done:    make(chan struct{}),
-		readyFn: cfg.readyFn,
+		pipe:      cfg.pipe,
+		done:      make(chan struct{}),
+		readyFn:   cfg.readyFn,
+		cleanupFn: cleanupFn,
 	}
 
 	extraFiles, err := cfg.setupTransport(ctx, f)

@@ -29,10 +29,15 @@ func main() {
 	server := httptest.NewServer(documentHandlers())
 	defer server.Close()
 
-	b, err := support.Connect(ctx, opts)
+	firefox, b, err := support.Connect(ctx, opts)
 	support.Must(err)
 
-	defer b.Close()
+	defer func() {
+		_ = b.Close(ctx)
+		if firefox != nil {
+			_ = firefox.Close()
+		}
+	}()
 
 	sub, err := b.Client().Subscribe(ctx, []string{
 		protocol.NetworkBeforeRequestSent,

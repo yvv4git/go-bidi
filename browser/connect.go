@@ -2,6 +2,7 @@ package browser
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"sync"
 
@@ -53,7 +54,7 @@ func ConnectEndpoint(ctx context.Context, addr string, opts ...Option) (*Browser
 	// flow used by newer browser implementations.
 	browser, fallbackErr := ConnectBiDi(ctx, addr, opts...)
 	if fallbackErr != nil {
-		return nil, err
+		return nil, fmt.Errorf("handshake: %w; direct BiDi: %w", err, fallbackErr)
 	}
 
 	return browser, nil
@@ -70,6 +71,11 @@ func newBrowser(client *Client, session *Session) *Browser {
 // Session returns the underlying session handle.
 func (b *Browser) Session() *Session {
 	return b.session
+}
+
+// Client returns the underlying client that owns the transport.
+func (b *Browser) Client() *Client {
+	return b.client
 }
 
 // NewPage creates a new tab and returns its Page handle.

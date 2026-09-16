@@ -11,13 +11,14 @@ import (
 type Command struct {
 	ID     int64           `json:"id"`
 	Method string          `json:"method"`
-	Params json.RawMessage `json:"params,omitempty"`
+	Params json.RawMessage `json:"params"`
 }
 
 // NewCommand builds a Command, encoding params as JSON. A nil params is
-// omitted from the wire frame, as for commands that take no parameters.
+// encoded as an empty object, since WebDriver BiDi requires the params
+// member on every command.
 func NewCommand(id int64, method string, params any) (*Command, error) {
-	cmd := &Command{ID: id, Method: method}
+	cmd := &Command{ID: id, Method: method, Params: json.RawMessage("{}")}
 
 	if params == nil {
 		return cmd, nil

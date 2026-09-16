@@ -35,8 +35,8 @@ func TestNewCommandWithoutParams(t *testing.T) {
 		t.Fatalf("new command: %v", err)
 	}
 
-	if cmd.Params != nil {
-		t.Fatalf("params: got %s, want nil", cmd.Params)
+	if string(cmd.Params) != `{}` {
+		t.Fatalf("params: got %s, want {}", cmd.Params)
 	}
 }
 
@@ -64,7 +64,7 @@ func TestCommandEncode(t *testing.T) {
 		t.Fatalf("encode: %v", err)
 	}
 
-	if got, want := string(data), `{"id":7,"method":"session.status"}`; got != want {
+	if got, want := string(data), `{"id":7,"method":"session.status","params":{}}`; got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}
 }

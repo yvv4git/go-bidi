@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/yvv4git/go-bidi"
-	"github.com/yvv4git/go-bidi/protocol"
 )
 
 // Options holds the command-line flags shared by every example.
@@ -32,40 +31,24 @@ func Flag(fs *flag.FlagSet) *Options {
 	return o
 }
 
-// Browser is a connected BiDi session together with the client that owns
-// its transport. It is created by Connect and shut down with Close.
-type Browser struct {
-	client  *bidi.Client
-	session *bidi.Session
-	firefox *bidi.Firefox
-	ctx     context.Context
-}
-
 // Connect establishes a session over o.Endpoint, or over a freshly
 // launched headless Firefox when that is empty.
-func Connect(ctx context.Context, o *Options) (*Browser, error) {
+func Connect(ctx context.Context, o *Options) (*bidi.Firefox, *bidi.Browser, error) {
 	addr, firefox, err := target(ctx, o)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	result, err := bidi.Handshake(ctx, addr, bidi.WithTimeout(o.Timeout))
+	b, err := bidi.ConnectEndpoint(ctx, addr, bidi.WithTimeout(o.Timeout))
 	if err != nil {
 		if firefox != nil {
 			_ = firefox.Close()
 		}
 
-		return nil, fmt.Errorf("handshake: %w", err)
+		return nil, nil, fmt.Errorf("connect: %w", err)
 	}
 
-	client := bidi.NewClient(result.Transport, bidi.WithTimeout(o.Timeout))
-
-	return &Browser{
-		client:  client,
-		session: bidi.NewSession(client, result.SessionID),
-		firefox: firefox,
-		ctx:     ctx,
-	}, nil
+	return firefox, b, nil
 }
 
 // target returns the endpoint address of o.Endpoint, launching a headless
@@ -85,43 +68,6 @@ func target(ctx context.Context, o *Options) (string, *bidi.Firefox, error) {
 	}
 
 	return firefox.Endpoint().String(), firefox, nil
-}
-
-// Client returns the client that owns the transport.
-func (b *Browser) Client() *bidi.Client {
-	return b.client
-}
-
-// Session returns the session handle.
-func (b *Browser) Session() *bidi.Session {
-	return b.session
-}
-
-// NewPage opens a new tab and returns its page handle.
-func (b *Browser) NewPage(ctx context.Context) (*bidi.Page, error) {
-	result, err := b.session.CreateBrowsingContext(
-		ctx,
-		protocol.BrowsingContextCreateParams{Type: protocol.ContextTypeTab},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("create browsing context: %w", err)
-	}
-
-	return bidi.NewPage(b.client, result.Context), nil
-}
-
-// Close ends the session, closes the transport and stops a launched
-// Firefox. It is safe to call more than once.
-func (b *Browser) Close() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	_ = b.session.End(ctx)
-	_ = b.client.Close()
-
-	if b.firefox != nil {
-		_ = b.firefox.Close()
-	}
 }
 
 // Must logs the error and exits when err is non-nil.

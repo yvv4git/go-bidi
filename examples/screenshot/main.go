@@ -29,10 +29,15 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
 	defer cancel()
 
-	b, err := support.Connect(ctx, opts)
+	firefox, b, err := support.Connect(ctx, opts)
 	support.Must(err)
 
-	defer b.Close()
+	defer func() {
+		_ = b.Close(ctx)
+		if firefox != nil {
+			_ = firefox.Close()
+		}
+	}()
 
 	page, err := b.NewPage(ctx)
 	support.Must(err)

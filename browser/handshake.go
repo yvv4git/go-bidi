@@ -132,7 +132,10 @@ func (c *config) newSessionRequest(
 		return nil, err
 	}
 
-	endpoint := strings.TrimRight(addr, "/") + _sessionPath
+	endpoint := strings.TrimRight(addr, "/")
+	if !strings.HasSuffix(endpoint, _sessionPath) {
+		endpoint += _sessionPath
+	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
@@ -174,6 +177,9 @@ func (c *config) createSession(
 	ctx context.Context,
 	addr string,
 ) (*sessionResponse, error) {
+	// Convert ws:// or wss:// to http:// or https:// for the HTTP request.
+	addr = wsToHTTP(addr)
+
 	req, err := c.newSessionRequest(ctx, addr)
 	if err != nil {
 		return nil, err
@@ -255,6 +261,23 @@ func httpToWSURL(addr string) string {
 	}
 
 	u.Path = _sessionPath
+
+	return u.String()
+}
+
+// wsToHTTP converts a WebSocket URL to an HTTP URL for use in HTTP requests.
+func wsToHTTP(addr string) string {
+	u, err := url.Parse(addr)
+	if err != nil {
+		return addr
+	}
+
+	switch u.Scheme {
+	case "ws":
+		u.Scheme = "http"
+	case "wss":
+		u.Scheme = "https"
+	}
 
 	return u.String()
 }
