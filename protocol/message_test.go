@@ -110,6 +110,19 @@ func TestDecodeWithoutType(t *testing.T) {
 	}
 }
 
+// Message is a sealed interface: only Response and Event implement it, and
+// the marker methods let the decoder dispatch on the concrete type.
+func TestMessageSealedInterface(t *testing.T) {
+	msgs := []Message{
+		&Response{ID: 1, Result: json.RawMessage(`{}`)},
+		&Event{Method: LogEntryAdded, Params: json.RawMessage(`{}`)},
+	}
+
+	for _, msg := range msgs {
+		msg.isMessage()
+	}
+}
+
 func TestErrorString(t *testing.T) {
 	err := &Error{Code: "unknown command", Message: "bad method"}
 

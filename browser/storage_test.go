@@ -147,6 +147,32 @@ func TestPageSessionStorage(t *testing.T) {
 	assertExpression(t, caller, `sessionStorage.getItem("k")`)
 }
 
+func TestPageSetSessionStorage(t *testing.T) {
+	caller := &fakeCaller{results: map[string]string{
+		protocol.ScriptEvaluate: `{"type":"success","realm":"r1","result":{"type":"undefined"}}`,
+	}}
+	page := NewPage(caller, "c1")
+
+	if err := page.SetSessionStorage(context.Background(), "k", "val1"); err != nil {
+		t.Fatalf("SetSessionStorage: %v", err)
+	}
+
+	assertExpression(t, caller, `sessionStorage.setItem("k", "val1")`)
+}
+
+func TestPageRemoveSessionStorage(t *testing.T) {
+	caller := &fakeCaller{results: map[string]string{
+		protocol.ScriptEvaluate: `{"type":"success","realm":"r1","result":{"type":"undefined"}}`,
+	}}
+	page := NewPage(caller, "c1")
+
+	if err := page.RemoveSessionStorage(context.Background(), "k"); err != nil {
+		t.Fatalf("RemoveSessionStorage: %v", err)
+	}
+
+	assertExpression(t, caller, `sessionStorage.removeItem("k")`)
+}
+
 func assertExpression(t *testing.T, caller *fakeCaller, want string) {
 	t.Helper()
 

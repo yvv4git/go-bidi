@@ -3,6 +3,7 @@ package launcher
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"testing"
@@ -217,6 +218,28 @@ func TestLaunchPipe(t *testing.T) {
 
 	if err := f.Close(); err != nil {
 		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestHTTPReady(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("listen: %v", err)
+	}
+
+	endpoint := &url.URL{Host: ln.Addr().String()}
+	f := &Firefox{}
+
+	if err := f.httpReady(context.Background(), endpoint); err != nil {
+		t.Fatalf("httpReady on open port: %v", err)
+	}
+
+	if err := ln.Close(); err != nil {
+		t.Fatalf("close listener: %v", err)
+	}
+
+	if err := f.httpReady(context.Background(), endpoint); err == nil {
+		t.Fatal("httpReady on closed port: expected error")
 	}
 }
 

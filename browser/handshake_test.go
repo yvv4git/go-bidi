@@ -3,6 +3,7 @@ package browser
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +15,13 @@ import (
 
 	"github.com/yvv4git/go-bidi/transport"
 )
+
+// roundTripFunc adapts a function into an http.RoundTripper.
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return f(r)
+}
 
 func newHandshakeServer(t *testing.T, session http.HandlerFunc) *httptest.Server {
 	t.Helper()
@@ -136,5 +144,22 @@ func TestHandshakeStatusError(t *testing.T) {
 
 	if _, err := Handshake(context.Background(), srv.URL); err == nil {
 		t.Fatal("Handshake: expected error")
+	}
+}
+
+func TestHandshakeWithHTTPClient(t *testing.T) {
+	sentinel := errors.New("custom client used")
+
+	_, err := Handshake(
+		context.Background(),
+		"http://127.0.0.1:1",
+		WithHTTPClient(&http.Client{
+			Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+				return nil, sentinel
+			}),
+		}),
+	)
+	if !errors.Is(err, sentinel) {
+		t.Fatalf("Handshake error = %v, want %v", err, sentinel)
 	}
 }

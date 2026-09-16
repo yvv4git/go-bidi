@@ -165,8 +165,8 @@ BiDi specifics that matter for the implementation:
 ## Phase 13. Quality, tests, documentation
 
 - [ ] Integration tests against Firefox Nightly with BiDi
-- [ ] Test fixture pages for navigation/network/DOM
-- [ ] Run `go test ./...`, `go vet ./...`, `golangci-lint run`
-- [ ] Update `README.md` (install, example, capability table, layout)
-- [ ] CI (GitHub Actions): build, lint, test
-- [ ] Note the analogy with `go-juggler` and link to `go-juggler-mcp`
+- [x] Test fixture pages for navigation/network/DOM
+- [x] Run `go test ./...`, `go vet ./...`, `golangci-lint run`
+- [x] Update `README.md` (install, example, capability table, layout)
+- [x] CI (GitHub Actions): build, lint, test
+- [x] Note the analogy with `go-juggler` and link to `go-juggler-mcp`

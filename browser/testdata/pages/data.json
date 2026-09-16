@@ -1,0 +1,4 @@
+{
+  "fixture": "go-bidi",
+  "pages": ["index", "nav", "next", "network"]
+}

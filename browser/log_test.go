@@ -77,6 +77,58 @@ func TestLogsRun(t *testing.T) {
 	waitLogs(t, logs, func(entries []*Entry) bool { return len(entries) == 1 })
 }
 
+func TestLogsCount(t *testing.T) {
+	sub := &Subscription{ch: make(chan protocol.Event, _eventBuffer)}
+	logs := NewLogs(sub, "c1")
+
+	if got := logs.Count(); got != 0 {
+		t.Errorf("Count = %d, want 0", got)
+	}
+
+	logs.record(protocol.LogEntryAdded, entryParams(t, logEntryParams("c1", "a")))
+	logs.record(protocol.LogEntryAdded, entryParams(t, logEntryParams("c1", "b")))
+
+	if got := logs.Count(); got != 2 {
+		t.Errorf("Count = %d, want 2", got)
+	}
+}
+
+func TestLogsClose(t *testing.T) {
+	tr := newFakeTransport()
+	client := NewClient(tr)
+	defer closeClient(t, client)
+
+	go respondSuccess(t, tr, `{"subscription":"sub-1"}`)
+
+	sub, err := client.Subscribe(context.Background(), []string{"log"})
+	if err != nil {
+		t.Fatalf("Subscribe: %v", err)
+	}
+
+	logs := NewLogs(sub, "c1")
+	go logs.run()
+
+	go respondSuccess(t, tr, `{}`)
+
+	if err := logs.Close(context.Background()); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+
+	select {
+	case _, open := <-sub.Receive():
+		if open {
+			t.Error("subscription channel still open after Close")
+		}
+	default:
+	}
+
+	if _, err := logs.Poll(context.Background(), func(_ []*Entry) bool {
+		return false
+	}); err != context.Canceled {
+		t.Errorf("Poll error = %v, want context.Canceled", err)
+	}
+}
+
 func waitLogs(t *testing.T, logs *Logs, cond func([]*Entry) bool) {
 	t.Helper()
 
