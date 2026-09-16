@@ -18,53 +18,50 @@ func main() {
 
 	flag.Parse()
 
-	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
-	defer cancel()
+	support.Run(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
+		defer cancel()
 
-	firefox, b, err := support.Connect(ctx, opts)
-	support.Must(err)
+		firefox, b, err := support.Connect(ctx, opts)
+		support.Must(err)
 
-	defer func() {
-		_ = b.Close(ctx)
-		if firefox != nil {
-			_ = firefox.Close()
-		}
-	}()
+		defer support.Cleanup(b, firefox)
 
-	sub, err := b.Client().Subscribe(ctx, []string{
-		protocol.BrowsingContextContextCreated,
-		protocol.BrowsingContextDomContentLoaded,
-		protocol.BrowsingContextLoad,
-		protocol.ScriptRealmCreated,
-	})
-	support.Must(err)
+		sub, err := b.Client().Subscribe(ctx, []string{
+			protocol.BrowsingContextContextCreated,
+			protocol.BrowsingContextDomContentLoaded,
+			protocol.BrowsingContextLoad,
+			protocol.ScriptRealmCreated,
+		})
+		support.Must(err)
 
-	defer func() { _ = sub.Close(ctx) }()
+		defer func() { _ = sub.Close(ctx) }()
 
-	page, err := b.NewPage(ctx)
-	support.Must(err)
+		page, err := b.NewPage(ctx)
+		support.Must(err)
 
-	_, err = page.Navigate(ctx, "https://example.com/")
-	support.Must(err)
+		_, err = page.Navigate(ctx, "https://example.com/")
+		support.Must(err)
 
-	deadline := time.After(3 * time.Second)
+		deadline := time.After(3 * time.Second)
 
-	for {
-		select {
-		case event, ok := <-sub.Receive():
-			if !ok {
+		for {
+			select {
+			case event, ok := <-sub.Receive():
+				if !ok {
+					return
+				}
+
+				printEvent(event)
+
+			case <-deadline:
+				return
+
+			case <-ctx.Done():
 				return
 			}
-
-			printEvent(event)
-
-		case <-deadline:
-			return
-
-		case <-ctx.Done():
-			return
 		}
-	}
+	})
 }
 
 // printEvent decodes the params of a subscribed event into its documented

@@ -15,27 +15,24 @@ func main() {
 
 	flag.Parse()
 
-	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
-	defer cancel()
+	support.Run(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
+		defer cancel()
 
-	firefox, b, err := support.Connect(ctx, opts)
-	support.Must(err)
+		firefox, b, err := support.Connect(ctx, opts)
+		support.Must(err)
 
-	defer func() {
-		_ = b.Close(ctx)
-		if firefox != nil {
-			_ = firefox.Close()
-		}
-	}()
+		defer support.Cleanup(b, firefox)
 
-	page, err := b.NewPage(ctx)
-	support.Must(err)
+		page, err := b.NewPage(ctx)
+		support.Must(err)
 
-	nav, err := page.Navigate(ctx, "https://www.wikipedia.org/")
-	support.Must(err)
-	fmt.Printf("loaded %s\n", nav.URL)
-	fmt.Println("waiting 3 seconds...")
-	time.Sleep(3 * time.Second)
+		nav, err := page.Navigate(ctx, "https://www.wikipedia.org/")
+		support.Must(err)
+		fmt.Printf("loaded %s\n", nav.URL)
+		fmt.Println("waiting 3 seconds...")
+		time.Sleep(3 * time.Second)
 
-	_ = page.Close(ctx)
+		_ = page.Close(ctx)
+	})
 }

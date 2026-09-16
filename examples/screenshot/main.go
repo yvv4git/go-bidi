@@ -26,31 +26,28 @@ func main() {
 
 	flag.Parse()
 
-	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
-	defer cancel()
+	support.Run(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
+		defer cancel()
 
-	firefox, b, err := support.Connect(ctx, opts)
-	support.Must(err)
+		firefox, b, err := support.Connect(ctx, opts)
+		support.Must(err)
 
-	defer func() {
-		_ = b.Close(ctx)
-		if firefox != nil {
-			_ = firefox.Close()
-		}
-	}()
+		defer support.Cleanup(b, firefox)
 
-	page, err := b.NewPage(ctx)
-	support.Must(err)
+		page, err := b.NewPage(ctx)
+		support.Must(err)
 
-	defer func() { _ = page.Close(ctx) }()
+		defer func() { _ = page.Close(ctx) }()
 
-	support.Must(page.SetViewport(ctx, viewportWidth, viewportHeight))
+		support.Must(page.SetViewport(ctx, viewportWidth, viewportHeight))
 
-	_, err = page.Navigate(ctx, "https://example.com/")
-	support.Must(err)
+		_, err = page.Navigate(ctx, "https://example.com/")
+		support.Must(err)
 
-	support.Must(capture(ctx, page, filepath.Join(*dir, "viewport.png"), false))
-	support.Must(capture(ctx, page, filepath.Join(*dir, "full.png"), true))
+		support.Must(capture(ctx, page, filepath.Join(*dir, "viewport.png"), false))
+		support.Must(capture(ctx, page, filepath.Join(*dir, "full.png"), true))
+	})
 }
 
 // capture screenshots the page and writes the PNG to path, reporting the

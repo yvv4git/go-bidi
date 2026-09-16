@@ -7,6 +7,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/yvv4git/go-bidi"
@@ -51,6 +54,39 @@ func Connect(ctx context.Context, o *Options) (*bidi.Firefox, *bidi.Browser, err
 	}
 
 	return firefox, b, nil
+}
+
+// Cleanup closes the browser and the launched Firefox process (if any).
+// Safe to call multiple times.
+func Cleanup(b *bidi.Browser, firefox *bidi.Firefox) {
+	if b != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		_ = b.Close(ctx)
+	}
+
+	if firefox != nil {
+		_ = firefox.Close()
+	}
+}
+
+// Run calls fn with signal handling so that Cleanup runs on SIGINT/SIGTERM.
+func Run(fn func()) {
+	done := make(chan struct{})
+
+	go func() {
+		fn()
+		close(done)
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case <-done:
+	case <-sig:
+	}
 }
 
 // target returns the endpoint address of o.Endpoint, launching a headless

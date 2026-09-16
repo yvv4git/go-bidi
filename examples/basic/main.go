@@ -22,32 +22,29 @@ func main() {
 
 	flag.Parse()
 
-	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
-	defer cancel()
+	support.Run(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
+		defer cancel()
 
-	firefox, b, err := support.Connect(ctx, opts)
-	support.Must(err)
+		firefox, b, err := support.Connect(ctx, opts)
+		support.Must(err)
 
-	defer func() {
-		_ = b.Close(ctx)
-		if firefox != nil {
-			_ = firefox.Close()
-		}
-	}()
+		defer support.Cleanup(b, firefox)
 
-	page, err := b.NewPage(ctx)
-	support.Must(err)
+		page, err := b.NewPage(ctx)
+		support.Must(err)
 
-	defer func() { _ = page.Close(ctx) }()
+		defer func() { _ = page.Close(ctx) }()
 
-	support.Must(page.SetViewport(ctx, viewportWidth, viewportHeight))
+		support.Must(page.SetViewport(ctx, viewportWidth, viewportHeight))
 
-	nav, err := page.Navigate(ctx, "https://example.com/")
-	support.Must(err)
-	fmt.Printf("loaded %s (navigation %s)\n", nav.URL, nav.Navigation)
+		nav, err := page.Navigate(ctx, "https://example.com/")
+		support.Must(err)
+		fmt.Printf("loaded %s (navigation %s)\n", nav.URL, nav.Navigation)
 
-	png, err := page.Screenshot(ctx, false)
-	support.Must(err)
-	support.Must(os.WriteFile(*out, png, 0o600))
-	fmt.Printf("wrote %s (%d bytes)\n", *out, len(png))
+		png, err := page.Screenshot(ctx, false)
+		support.Must(err)
+		support.Must(os.WriteFile(*out, png, 0o600))
+		fmt.Printf("wrote %s (%d bytes)\n", *out, len(png))
+	})
 }

@@ -21,19 +21,25 @@ func main() {
 
 	flag.Parse()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
+	support.Run(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		defer cancel()
 
-	fmt.Printf("connecting to %s\n", *endpoint)
+		fmt.Printf("connecting to %s\n", *endpoint)
 
-	browser, err := bidi.ConnectEndpoint(ctx, *endpoint)
-	support.Must(err)
+		browser, err := connect(ctx, *endpoint)
+		support.Must(err)
 
-	defer func() { _ = browser.Close(ctx) }()
+		defer support.Cleanup(browser, nil)
 
-	fmt.Printf("session: %s\n", browser.Session().ID())
+		fmt.Printf("session: %s\n", browser.Session().ID())
 
-	status, err := browser.Session().Status(ctx)
-	support.Must(err)
-	fmt.Printf("status: ready=%t message=%q\n", status.Ready, status.Message)
+		status, err := browser.Session().Status(ctx)
+		support.Must(err)
+		fmt.Printf("status: ready=%t message=%q\n", status.Ready, status.Message)
+	})
+}
+
+func connect(ctx context.Context, addr string) (*bidi.Browser, error) {
+	return bidi.ConnectEndpoint(ctx, addr)
 }
