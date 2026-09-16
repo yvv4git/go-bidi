@@ -1,6 +1,6 @@
 # connect
 
-Connects to an already-running Firefox via remote debugging.
+Connects to an already-running Firefox and reports the session status.
 
 ## Run
 
@@ -8,7 +8,25 @@ Connects to an already-running Firefox via remote debugging.
 go run examples/connect/main.go
 ```
 
-Firefox must be running with `--remote-debugging-port 9222`.
+## Examples
+
+```bash
+# Default: connect to localhost:9222
+go run examples/connect/main.go
+
+# Connect to custom endpoint
+go run examples/connect/main.go -endpoint http://127.0.0.1:9333
+
+# With timeout
+go run examples/connect/main.go -endpoint http://127.0.0.1:9222 -timeout 10s
+```
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-endpoint` | `http://127.0.0.1:9222` | WebDriver BiDi endpoint of a running Firefox |
+| `-timeout` | `2m` | Overall command timeout |
 
 ## What it demonstrates
 

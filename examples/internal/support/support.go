@@ -17,6 +17,7 @@ type Options struct {
 	Endpoint string
 	ExecPath string
 	Timeout  time.Duration
+	Headless bool
 }
 
 // Flag registers the shared -endpoint, -exec and -timeout flags on fs and
@@ -27,6 +28,7 @@ func Flag(fs *flag.FlagSet) *Options {
 	fs.StringVar(&o.Endpoint, "endpoint", "", "connect to this WebDriver BiDi endpoint")
 	fs.StringVar(&o.ExecPath, "exec", "", "path to the Firefox binary to launch")
 	fs.DurationVar(&o.Timeout, "timeout", 2*time.Minute, "overall command timeout")
+	fs.BoolVar(&o.Headless, "headless", true, "run Firefox in headless mode")
 
 	return o
 }
@@ -60,7 +62,7 @@ func target(ctx context.Context, o *Options) (string, *bidi.Firefox, error) {
 
 	firefox, err := bidi.Launch(ctx,
 		bidi.WithLaunchExecPath(o.ExecPath),
-		bidi.WithLaunchHeadless(true),
+		bidi.WithLaunchHeadless(o.Headless),
 		bidi.WithLaunchTimeout(o.Timeout),
 	)
 	if err != nil {
