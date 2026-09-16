@@ -55,13 +55,9 @@ func main() {
 	redirect := server.URL + "/moved"
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
+	wg.Go(func() {
 		redirectRequests(ctx, b.Session(), sub, target, redirect)
-	}()
+	})
 
 	page, err := b.NewPage(ctx)
 	support.Must(err)
