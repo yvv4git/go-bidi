@@ -1,5 +1,7 @@
 # go-bidi
 
+![go-bidi logo](./assets/logo.jpeg)
+
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white&style=flat-square)][Go] [![License](https://img.shields.io/badge/license-custom-blue.svg?style=flat-square)][LICENSE] [![CI](https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml/badge.svg)][CI]
 
 Go client for the [WebDriver BiDi] protocol. It drives BiDi-enabled
