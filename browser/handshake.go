@@ -3,14 +3,18 @@ package browser
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/coder/websocket"
 	"github.com/yvv4git/go-bidi/protocol"
 	"github.com/yvv4git/go-bidi/transport"
 )
@@ -302,11 +306,6 @@ func ConnectBiDi(
 		return nil, fmt.Errorf("parse websocket url: %w", err)
 	}
 
-	tr, err := cfg.dial(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("dial biDi: %w", err)
-	}
-
 	alwaysMatch := make(map[string]any, len(cfg.capabilities)+1)
 	for key, value := range cfg.capabilities {
 		alwaysMatch[key] = value
@@ -314,7 +313,46 @@ func ConnectBiDi(
 
 	alwaysMatch[_capWebSocketURL] = true
 
-	client := NewClient(tr, opts...)
+	browser, err := connectBiDiAttempt(ctx, endpoint, cfg, alwaysMatch)
+	if err == nil {
+		return browser, nil
+	}
+
+	// If session.new failed with "Maximum number of active sessions",
+	// try to end a zombie session left by a previous run.
+	if !isMaxSessionsError(err) {
+		return nil, err
+	}
+
+	zombieID := loadSessionID(endpoint)
+	if zombieID == "" {
+		return nil, fmt.Errorf("session already active (no stored session id to recover): %w", err)
+	}
+
+	if recoveryErr := endZombieSession(ctx, endpoint, zombieID); recoveryErr != nil {
+		return nil, fmt.Errorf("session already active (recovery failed: %v): %w", recoveryErr, err)
+	}
+
+	browser, err = connectBiDiAttempt(ctx, endpoint, cfg, alwaysMatch)
+	if err != nil {
+		return nil, fmt.Errorf("session already active (recovery succeeded but retry failed): %w", err)
+	}
+
+	return browser, nil
+}
+
+func connectBiDiAttempt(
+	ctx context.Context,
+	endpoint *url.URL,
+	cfg config,
+	alwaysMatch map[string]any,
+) (*Browser, error) {
+	tr, err := cfg.dial(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("dial biDi: %w", err)
+	}
+
+	client := NewClient(tr, optsToSlice(cfg)...)
 
 	params := protocol.SessionNewParams{
 		Capabilities: protocol.SessionCapabilities{
@@ -325,9 +363,103 @@ func ConnectBiDi(
 	session, err := CreateSession(ctx, client, params)
 	if err != nil {
 		_ = client.Close()
-
 		return nil, err
 	}
 
+	saveSessionID(endpoint, session.ID())
+
 	return newBrowser(client, session), nil
+}
+
+func optsToSlice(cfg config) []Option {
+	var opts []Option
+
+	if cfg.capabilities != nil {
+		opts = append(opts, WithCapabilities(cfg.capabilities))
+	}
+
+	if cfg.timeout != 0 {
+		opts = append(opts, WithTimeout(cfg.timeout))
+	}
+
+	if len(cfg.subprotocols) > 0 {
+		opts = append(opts, WithSubprotocol(cfg.subprotocols...))
+	}
+
+	return opts
+}
+
+func isMaxSessionsError(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "Maximum number of active sessions")
+}
+
+func sessionFilePath(endpoint *url.URL) string {
+	h := sha256.Sum256([]byte(endpoint.Host))
+	name := fmt.Sprintf("bidi-session-%x", h[:8])
+
+	return filepath.Join(os.TempDir(), name)
+}
+
+func saveSessionID(endpoint *url.URL, sessionID string) {
+	path := sessionFilePath(endpoint)
+	_ = os.WriteFile(path, []byte(sessionID), 0o600)
+}
+
+func loadSessionID(endpoint *url.URL) string {
+	path := sessionFilePath(endpoint)
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimSpace(string(data))
+}
+
+func endZombieSession(ctx context.Context, endpoint *url.URL, sessionID string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	conn, _, err := websocket.Dial(ctx, endpoint.String(), nil)
+	if err != nil {
+		return fmt.Errorf("dial: %w", err)
+	}
+	defer func() { _ = conn.CloseNow() }()
+
+	params := map[string]any{"sessionId": sessionID}
+	msg := struct {
+		ID     int            `json:"id"`
+		Method string         `json:"method"`
+		Params map[string]any `json:"params"`
+	}{1, protocol.SessionEnd, params}
+
+	data, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	if err := conn.Write(ctx, websocket.MessageText, data); err != nil {
+		return fmt.Errorf("write: %w", err)
+	}
+
+	_, resp, err := conn.Read(ctx)
+	if err != nil {
+		return fmt.Errorf("read: %w", err)
+	}
+
+	var result struct {
+		Type  string `json:"type"`
+		Error string `json:"error"`
+	}
+	if err := json.Unmarshal(resp, &result); err != nil {
+		return err
+	}
+
+	if result.Error != "" {
+		return fmt.Errorf("%s", result.Error)
+	}
+
+	_ = os.Remove(sessionFilePath(endpoint))
+
+	return nil
 }

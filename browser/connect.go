@@ -3,6 +3,7 @@ package browser
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"sort"
 	"sync"
 
@@ -46,6 +47,7 @@ func ConnectEndpoint(ctx context.Context, addr string, opts ...Option) (*Browser
 	if err == nil {
 		client := NewClient(result.Transport, opts...)
 		session := NewSession(client, result.SessionID)
+		saveSessionIDFromWS(result.WebSocketURL, session.ID())
 
 		return newBrowser(client, session), nil
 	}
@@ -58,6 +60,15 @@ func ConnectEndpoint(ctx context.Context, addr string, opts ...Option) (*Browser
 	}
 
 	return browser, nil
+}
+
+func saveSessionIDFromWS(wsURL string, sessionID string) {
+	u, err := url.Parse(wsURL)
+	if err != nil {
+		return
+	}
+
+	saveSessionID(u, sessionID)
 }
 
 func newBrowser(client *Client, session *Session) *Browser {

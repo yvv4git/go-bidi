@@ -144,6 +144,24 @@ if err != nil {
 defer func() { _ = browser.Close(ctx) }()
 ```
 
+## Session management
+
+Firefox 158+ supports only **one** BiDi session at a time. If a client
+disconnects without calling `session.end`, the zombie session blocks all
+subsequent `session.new` calls with "Maximum number of active sessions".
+
+`ConnectEndpoint` and `ConnectBiDi` handle this automatically:
+
+1. On success, the library stores the session ID in the OS temp directory
+   (`os.TempDir()`).
+2. On the next connect, if `session.new` fails with "Maximum number of active
+   sessions", the library reads the stored ID, sends `session.end` for the
+   zombie session, and retries `session.new`.
+
+If you call `browser.Close(ctx)` or `Session.End(ctx)` on every code path
+(including defers), zombie sessions are avoided entirely. The recovery
+mechanism is a safety net for abnormal exits.
+
 ## Capabilities
 
 Implemented protocol modules and the commands they expose:
