@@ -1,21 +1,42 @@
-MIT License
-
+go-bidi License
 Copyright (c) 2026 YVV
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. GRANT OF USE
+   Permission is hereby granted, free of charge, to any person obtaining
+   a copy of this software and associated documentation files (the
+   "Software"), to use, copy, modify, and integrate the Software into
+   their own products, including commercial ones, subject to the
+   conditions below.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. RESTRICTIONS
+   The following are prohibited without prior written agreement with YVV:
+   - Selling, sublicensing, or distributing the Software or derivative
+     works as a standalone product
+   - Claiming authorship or ownership of the Software
+   - Removing this license notice from any copy
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. CONTRIBUTIONS
+   By submitting a pull request, you agree that your contribution is
+   provided under the same terms and that YVV has the right to include
+   it in this project.
+
+4. PATENT GRANT
+   Subject to the terms of this License, each contributor grants you a
+   perpetual, worldwide, non-exclusive, no-charge, royalty-free patent
+   license to make, have made, use, and sell the Software. If you
+   institute patent litigation against any entity alleging that the
+   Software constitutes patent infringement, your rights under this
+   License terminate immediately.
+
+5. COMMERCIAL REDISTRIBUTION
+   Commercial redistribution or resale of this Software, in whole or in
+   part, requires a separate written agreement with the copyright holder
+   (YVV), which may include revenue sharing terms.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

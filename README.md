@@ -1,6 +1,6 @@
 # go-bidi
 
-[![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white&style=flat-square)][Go] [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][LICENSE] [![CI](https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml/badge.svg)][CI]
+[![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white&style=flat-square)][Go] [![License](https://img.shields.io/badge/license-custom-blue.svg?style=flat-square)][LICENSE] [![CI](https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml/badge.svg)][CI]
 
 Go client for the [WebDriver BiDi] protocol. It drives BiDi-enabled
 browsers — Firefox Nightly and other WebDriver BiDi implementations — over a
@@ -261,10 +261,16 @@ library for a WebDriver BiDi-based MCP server.
 
 ## License
 
-MIT, see [LICENSE] and [NOTICE].
+Custom license — see [LICENSE] for full text.
+
+**Summary:**
+- Free to use, including in commercial products
+- No selling or redistribution as a standalone product
+- No claiming authorship or ownership
+- Contributions via pull requests are welcome
+- Commercial redistribution available by agreement with YVV
 
 [WebDriver BiDi]: https://w3c.github.io/webdriver-bidi/
 [Go]: https://go.dev/
 [LICENSE]: LICENSE
-[NOTICE]: NOTICE
 [CI]: https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml
