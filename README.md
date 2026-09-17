@@ -9,16 +9,6 @@ browsers — Firefox Nightly and other WebDriver BiDi implementations — over a
 single full-duplex WebSocket channel using JSON-RPC 2.0 messages, with no
 Selenium, Playwright or browser drivers required.
 
-<p align="center">
-  <a href="https://tonviewer.com/UQCcbp-mue-7HTjDNQ_ZrKtg-tUxIFu817APmItjXasiBGP3">
-    <img src="https://img.shields.io/badge/Buy%20me%20a%20TON-0098EA?style=for-the-badge">
-  </a>
-</p>
-
-<p align="center">
-  If this tool helps you, consider buying me a coffee!
-</p>
-
 The connection follows the WebDriver BiDi handshake: the client POSTs to the
 WebDriver classic `HTTP /session` endpoint with `webSocketUrl: true`, receives
 `sessionId` and `webSocketUrl`, and then speaks BiDi over the returned
@@ -286,3 +276,15 @@ Custom license — see [LICENSE] for full text.
 [Go]: https://go.dev/
 [LICENSE]: LICENSE
 [CI]: https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml
+
+---
+
+<p align="center">
+  <a href="https://tonviewer.com/UQCcbp-mue-7HTjDNQ_ZrKtg-tUxIFu817APmItjXasiBGP3">
+    <img src="https://img.shields.io/badge/Buy%20me%20a%20TON-0098EA?style=for-the-badge">
+  </a>
+</p>
+
+<p align="center">
+  If this tool helps you, consider buying me a coffee!
+</p>
