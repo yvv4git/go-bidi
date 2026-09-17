@@ -276,3 +276,15 @@ Custom license — see [LICENSE] for full text.
 [Go]: https://go.dev/
 [LICENSE]: LICENSE
 [CI]: https://github.com/yvv4git/go-bidi/actions/workflows/ci.yml
+
+---
+
+<p align="center">
+  <a href="https://tonviewer.com/UQCcbp-mue-7HTjDNQ_ZrKtg-tUxIFu817APmItjXasiBGP3">
+    <img src="https://img.shields.io/badge/Buy%20me%20a%20TON-0098EA?style=for-the-badge">
+  </a>
+</p>
+
+<p align="center">
+  If this tool helps you, consider buying me a coffee!
+</p>
