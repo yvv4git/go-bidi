@@ -12,11 +12,12 @@ required.
 ## What is WebDriver BiDi?
 
 WebDriver BiDi (Bidirectional) is the next-generation browser
-automation protocol. Unlike the classic WebDriver protocol which
-uses separate HTTP requests for each command, BiDi opens a single
-WebSocket connection and sends JSON-RPC messages bidirectionally.
-This allows the browser to push events (network requests, console
-logs, navigation) to the client in real time without polling.
+automation protocol. The name comes from Bi (Bidirectional) - both
+the client and the browser can send messages at any time over a
+single WebSocket connection, unlike the classic WebDriver protocol
+where only the client initiates requests. This allows the browser to
+push events (network requests, console logs, navigation) to the
+client in real time without polling.
 
 BiDi is being standardized by the W3C WebDriver Working Group and
 is supported by Firefox. Chrome and other browsers are adding
