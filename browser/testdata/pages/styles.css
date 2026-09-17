@@ -1,0 +1,12 @@
+body {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: #1a73e8;
+}
+
+#title {
+  color: #202124;
+}
